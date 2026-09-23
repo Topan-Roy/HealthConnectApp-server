@@ -13,8 +13,10 @@ export interface IUser {
   updatedAt: Date;
 }
 
+
+
 export interface IUserDocument extends IUser, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-export interface IUserModel extends Model<IUserDocument> {}
+export interface IUserModel extends Model<IUserDocument> { }
