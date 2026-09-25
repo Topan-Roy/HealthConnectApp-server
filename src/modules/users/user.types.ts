@@ -15,6 +15,8 @@ export interface IUser {
 
 
 
+
+
 export interface IUserDocument extends IUser, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
