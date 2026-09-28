@@ -41,16 +41,13 @@ export const initiatePatientRegistration = async (data: {
     await User.deleteOne({ _id: existingUser._id });
   }
 
-  // Hash password before saving
-  const salt = await bcrypt.genSalt(12);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
   // Create user with isVerified = false (not confirmed yet)
+  // Password will be automatically hashed by userSchema.pre('save') hook
   await User.create({
     name,
     email: email.toLowerCase(),
     phone,
-    password: hashedPassword,
+    password, // Pass plain text, model hook hashes it
     role: 'patient',
     isVerified: false,
     isActive: false, // becomes true after email verify + profile complete
