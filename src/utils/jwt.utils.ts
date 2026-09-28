@@ -21,3 +21,16 @@ export const verifyAccessToken = (token: string): TokenPayload => {
 export const verifyRefreshToken = (token: string): TokenPayload => {
   return jwt.verify(token, config.jwtRefreshSecret) as TokenPayload;
 };
+
+/**
+ * Temp token: issued after OTP verification, used to authorize profile completion.
+ * Short-lived (30 minutes). Contains email + userId.
+ */
+export const generateTempToken = (payload: { userId: string; email: string; role: string }): string => {
+  return jwt.sign(payload, config.jwtTempSecret, { expiresIn: '30m' });
+};
+
+export const verifyTempToken = (token: string): { userId: string; email: string; role: string } => {
+  return jwt.verify(token, config.jwtTempSecret) as { userId: string; email: string; role: string };
+};
+
