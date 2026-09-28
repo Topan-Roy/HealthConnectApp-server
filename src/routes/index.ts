@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import authRoutes from '../modules/auth/auth.routes';
+import userRoutes from '../modules/users/user.routes';
 
 const router = Router();
 
@@ -11,7 +12,8 @@ router.get('/health', (req: Request, res: Response) => {
   });
 });
 
-// Mount Auth routes
+// Mount Routes
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 
 export default router;

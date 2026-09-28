@@ -33,8 +33,12 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/health",
-              "host": ["{{BASE_URL}}"],
-              "path": ["health"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           }
         }
@@ -76,8 +80,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/patient/initiate",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "patient", "initiate"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "patient",
+                "initiate"
+              ]
             }
           }
         },
@@ -113,8 +123,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/patient/verify-otp",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "patient", "verify-otp"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "patient",
+                "verify-otp"
+              ]
             }
           }
         },
@@ -154,8 +170,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/patient/complete-profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "patient", "complete-profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "patient",
+                "complete-profile"
+              ]
             }
           }
         }
@@ -194,8 +216,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/doctor/initiate",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "doctor", "initiate"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "doctor",
+                "initiate"
+              ]
             }
           }
         },
@@ -231,8 +259,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/doctor/verify-otp",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "doctor", "verify-otp"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "doctor",
+                "verify-otp"
+              ]
             }
           }
         },
@@ -256,8 +290,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/doctor/complete-profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "doctor", "complete-profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "doctor",
+                "complete-profile"
+              ]
             },
             "description": "Submits Doctor Profile. Status becomes pending until Admin approval."
           }
@@ -299,8 +339,144 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/login",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Users Management (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/users",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "Admin ONLY. Returns list of all users and total count."
+          }
+        },
+        {
+          "name": "Get Single User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/users/{{userId}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Admin ONLY. Returns single user details."
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Doctor\",\n  \"email\": \"newdoc@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"doctor\",\n  \"phone\": \"01700112233\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": true,\n  \"role\": \"doctor\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users/{{userId}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/users/{{userId}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
             }
           }
         }
