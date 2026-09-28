@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "healthconnect-patient-registration",
     "name": "HealthConnect API",
-    "description": "HealthConnect Backend API - Patient Multi-Step Registration & Auth",
+    "description": "HealthConnect Backend API - Patient & Doctor Multi-Step Registration & Auth",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -35,8 +35,7 @@
               "raw": "{{BASE_URL}}/health",
               "host": ["{{BASE_URL}}"],
               "path": ["health"]
-            },
-            "description": "Check if the server is running"
+            }
           }
         }
       ]
@@ -79,8 +78,7 @@
               "raw": "{{BASE_URL}}/auth/patient/initiate",
               "host": ["{{BASE_URL}}"],
               "path": ["auth", "patient", "initiate"]
-            },
-            "description": "📌 Step 1: Submit basic account info.\n\nServer will:\n1. Create a pending user account\n2. Send a 6-digit OTP to the provided email\n\nRequired fields: name, email, password (min 8 chars)\nOptional fields: phone"
+            }
           }
         },
         {
@@ -94,13 +92,7 @@
                   "    const res = pm.response.json();",
                   "    if (res.data && res.data.tempToken) {",
                   "        pm.collectionVariables.set('TEMP_TOKEN', res.data.tempToken);",
-                  "        console.log('✅ OTP verified! Temp token saved.');",
-                  "        console.log('➡️  Now go to Step 3 - Complete Profile');",
                   "    }",
-                  "    pm.test('OTP verified successfully', () => {",
-                  "        pm.expect(res.success).to.be.true;",
-                  "        pm.expect(res.data.tempToken).to.be.a('string');",
-                  "    });",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -117,40 +109,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"roytopan734@gmail.com\",\n  \"otp\": \"ENTER_OTP_FROM_EMAIL\"\n}"
+              "raw": "{\n  \"email\": \"roytopan734@gmail.com\",\n  \"otp\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/patient/verify-otp",
               "host": ["{{BASE_URL}}"],
               "path": ["auth", "patient", "verify-otp"]
-            },
-            "description": "📌 Step 2: Enter the 6-digit OTP received in email.\n\n✅ On success: Returns a TEMP TOKEN (valid 30 min)\n→ This token is auto-saved to {{TEMP_TOKEN}} variable\n→ Use it in Step 3 as Bearer token"
+            }
           }
         },
         {
-          "name": "Step 2b - Resend OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"roytopan734@gmail.com\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/auth/patient/resend-otp",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "patient", "resend-otp"]
-            },
-            "description": "📌 Optional: Resend OTP if expired or not received.\n\nSends a fresh 6-digit OTP to the email."
-          }
-        },
-        {
-          "name": "Step 3 - Complete Profile (Full Data)",
+          "name": "Step 3 - Complete Profile",
           "event": [
             {
               "listen": "test",
@@ -160,48 +129,13 @@
                   "    const res = pm.response.json();",
                   "    if (res.data && res.data.accessToken) {",
                   "        pm.collectionVariables.set('ACCESS_TOKEN', res.data.accessToken);",
-                  "        console.log('🎉 Registration complete!');",
-                  "        console.log('✅ Access token saved to {{ACCESS_TOKEN}}');",
-                  "        console.log('User:', res.data.user.name, '|', res.data.user.role);",
                   "    }",
-                  "    pm.test('Profile completed & account activated', () => {",
-                  "        pm.expect(res.success).to.be.true;",
-                  "        pm.expect(res.data.user.isVerified).to.be.true;",
-                  "        pm.expect(res.data.user.isActive).to.be.true;",
-                  "    });",
                   "}"
                 ],
                 "type": "text/javascript"
               }
             }
           ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{TEMP_TOKEN}}",
-                "description": "Temp token from Step 2"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"dateOfBirth\": \"1995-06-15\",\n  \"gender\": \"male\",\n\n  \"bloodGroup\": \"B+\",\n  \"height\": 175,\n  \"weight\": 68,\n  \"allergies\": \"Dust, Pollen\",\n  \"existingConditions\": \"None\",\n\n  \"emergencyContactName\": \"Rahim Roy\",\n  \"emergencyContactRelationship\": \"Father\",\n  \"emergencyContactPhone\": \"01811111111\",\n\n  \"division\": \"Dhaka\",\n  \"district\": \"Dhaka\",\n  \"area\": \"Mirpur\",\n  \"fullAddress\": \"House 12, Road 5, Mirpur-10, Dhaka-1216\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/auth/patient/complete-profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "patient", "complete-profile"]
-            },
-            "description": "📌 Step 3: Submit personal + health + emergency + address info.\n\n🔑 Requires: Authorization: Bearer {{TEMP_TOKEN}} (from Step 2)\n\n✅ On success:\n- Patient profile saved\n- Account activated (isActive: true)\n- Returns accessToken + user data\n- Sets refreshToken cookie (httpOnly)\n\nAll fields are optional except the token!"
-          }
-        },
-        {
-          "name": "Step 3 - Complete Profile (Minimal - Skip optional)",
           "request": {
             "method": "POST",
             "header": [
@@ -216,14 +150,116 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"gender\": \"male\",\n  \"division\": \"Dhaka\",\n  \"district\": \"Dhaka\"\n}"
+              "raw": "{\n  \"dateOfBirth\": \"1995-06-15\",\n  \"gender\": \"male\",\n  \"bloodGroup\": \"B+\",\n  \"height\": 175,\n  \"weight\": 68,\n  \"allergies\": \"Dust, Pollen\",\n  \"existingConditions\": \"None\",\n  \"emergencyContactName\": \"Rahim Roy\",\n  \"emergencyContactRelationship\": \"Father\",\n  \"emergencyContactPhone\": \"01811111111\",\n  \"division\": \"Dhaka\",\n  \"district\": \"Dhaka\",\n  \"area\": \"Mirpur\",\n  \"fullAddress\": \"House 12, Road 5, Mirpur-10, Dhaka-1216\"\n}"
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/patient/complete-profile",
               "host": ["{{BASE_URL}}"],
               "path": ["auth", "patient", "complete-profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍⚕️ Doctor Registration (Multi-Step)",
+      "item": [
+        {
+          "name": "Step 1 - Initiate Registration (Send OTP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const res = pm.response.json();",
+                  "    console.log('✅ OTP sent! Check your email:', res.data.email);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Sarah Ahmed\",\n  \"email\": \"doctor1@gmail.com\",\n  \"password\": \"Test@1234\",\n  \"phone\": \"01700000000\"\n}"
             },
-            "description": "Minimal version - only required data, skip optional fields"
+            "url": {
+              "raw": "{{BASE_URL}}/auth/doctor/initiate",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "doctor", "initiate"]
+            }
+          }
+        },
+        {
+          "name": "Step 2 - Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const res = pm.response.json();",
+                  "    if (res.data && res.data.tempToken) {",
+                  "        pm.collectionVariables.set('TEMP_TOKEN', res.data.tempToken);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor1@gmail.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/doctor/verify-otp",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "doctor", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Step 3 - Complete Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TEMP_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"specialty\": \"Cardiology\",\n  \"qualification\": \"MBBS, MD (Cardiology)\",\n  \"experienceYears\": 8,\n  \"consultationFee\": 800,\n  \"hospitalClinic\": \"Square Hospital, Dhaka\",\n  \"documents\": {\n    \"medicalLicense\": \"DC-12345\",\n    \"nidPassport\": \"https://example.com/nid.jpg\",\n    \"degreeCertificate\": \"https://example.com/degree.jpg\",\n    \"profilePhoto\": \"https://example.com/photo.jpg\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/doctor/complete-profile",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "doctor", "complete-profile"]
+            },
+            "description": "Submits Doctor Profile. Status becomes pending until Admin approval."
           }
         }
       ]
@@ -242,7 +278,6 @@
                   "    const res = pm.response.json();",
                   "    if (res.data && res.data.accessToken) {",
                   "        pm.collectionVariables.set('ACCESS_TOKEN', res.data.accessToken);",
-                  "        console.log('✅ Logged in! Access token saved.');",
                   "    }",
                   "}"
                 ],
@@ -260,69 +295,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"roytopan734@gmail.com\",\n  \"password\": \"Test@1234\"\n}"
+              "raw": "{\n  \"email\": \"doctor1@gmail.com\",\n  \"password\": \"Test@1234\"\n}"
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/login",
               "host": ["{{BASE_URL}}"],
               "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Get Me (Protected)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{ACCESS_TOKEN}}"
-              }
-            ],
-            "url": {
-              "raw": "{{BASE_URL}}/auth/me",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "me"]
-            },
-            "description": "Get current logged-in user info. Requires valid access token."
-          }
-        },
-        {
-          "name": "Refresh Token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/auth/refresh-token",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "refresh-token"]
-            },
-            "description": "Refresh token is sent via httpOnly cookie automatically by the browser."
-          }
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{ACCESS_TOKEN}}"
-              }
-            ],
-            "url": {
-              "raw": "{{BASE_URL}}/auth/logout",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "logout"]
             }
           }
         }

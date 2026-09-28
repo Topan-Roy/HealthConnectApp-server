@@ -61,6 +61,9 @@ export const loginService = async (credentials: any): Promise<{ authData: AuthRe
 
   // Check if active
   if (!user.isActive) {
+    if (user.role === 'doctor') {
+      throw new Error('Your account is pending admin approval. You will be able to login once approved.');
+    }
     throw new Error('Account is deactivated');
   }
 
